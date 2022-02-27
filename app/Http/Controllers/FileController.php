@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\FileServiceInterface;
+use App\Services\UploadStatisticsServiceInterface;
 use App\Validators\FileValidator;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -14,10 +15,12 @@ class FileController extends Controller
      *
      * @param FileServiceInterface $fileService
      * @param FileValidator $fileValidator
+     * @param UploadStatisticsServiceInterface $uploadStatisticsService
      */
     public function __construct(
         private FileServiceInterface $fileService,
-        private FileValidator $fileValidator
+        private FileValidator $fileValidator,
+        private UploadStatisticsServiceInterface $uploadStatisticsService
     ) {
     }
 
@@ -39,6 +42,10 @@ class FileController extends Controller
         $response = response()->download($fileZip);
 
         register_shutdown_function('unlink', $fileZip);
+
+        $ipAddress = $request->ip();
+
+        $this->uploadStatisticsService->insertUploadStatistics($ipAddress);
 
         return $response;
     }

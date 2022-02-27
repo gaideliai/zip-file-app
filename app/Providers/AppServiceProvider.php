@@ -2,8 +2,12 @@
 
 namespace App\Providers;
 
+use App\Repositories\UploadStatisticsRepository;
+use App\Repositories\UploadStatisticsRepositoryInterface;
 use App\Services\FileService;
 use App\Services\FileServiceInterface;
+use App\Services\UploadStatisticsService;
+use App\Services\UploadStatisticsServiceInterface;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
 
@@ -19,6 +23,16 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(
             FileServiceInterface::class,
             FileService::class,
+        );
+
+        $this->app->bind(
+            UploadStatisticsServiceInterface::class,
+            UploadStatisticsService::class,
+        );
+
+        $this->app->bind(
+            UploadStatisticsRepositoryInterface::class,
+            UploadStatisticsRepository::class,
         );
     }
 
@@ -39,7 +53,7 @@ class AppServiceProvider extends ServiceProvider
                 return $sum;
             });
 
-            return $total_size < $parameters[0] * 1024;
+            return $total_size < $parameters[0] * 1024 * 1024;
         },
             "The total size of uploaded files must not exceed :maxM."
         );
