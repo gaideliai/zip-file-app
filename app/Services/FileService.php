@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Carbon\Carbon;
+use Exception;
 use ZipArchive;
 
 class FileService implements FileServiceInterface
@@ -16,21 +17,24 @@ class FileService implements FileServiceInterface
      */
     public function archiveFiles(array $files): string
     {
-        $zip = new ZipArchive();
+        try {
+            $zip = new ZipArchive();
 
-        $directoryPath = sys_get_temp_dir() . '/zipFiles/';
+            $directoryPath = sys_get_temp_dir() . '/zipFiles/';
+            $this->bootstrapDirectory($directoryPath);
 
-        $this->bootstrapDirectory($directoryPath);
+            $todaysDate = Carbon::today()->toDateString();
+            $fileName = "zip-$todaysDate.zip";
 
-        $todaysDate = Carbon::today()->toDateString();
-        $fileName = "zip-$todaysDate.zip";
+            if ($zip->open("$directoryPath/$fileName", ZipArchive::CREATE) === true) {
+                foreach ($files as $file) {
+                    $zip->addFile($file->path(), $file->getClientOriginalName());
+                }
 
-        if ($zip->open("$directoryPath/$fileName", ZipArchive::CREATE) === true) {
-            foreach ($files as $file) {
-                $zip->addFile($file->path(), $file->getClientOriginalName());
+                $zip->close();
             }
-
-            $zip->close();
+        } catch (Exception $e) {
+            throw $e;
         }
 
         return $directoryPath . $fileName;
