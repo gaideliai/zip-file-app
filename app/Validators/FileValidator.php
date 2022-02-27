@@ -4,7 +4,6 @@ namespace App\Validators;
 
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Support\Facades\Validator as ValidatorFacade;
-use Illuminate\Validation\ValidationException;
 
 class FileValidator
 {
@@ -20,7 +19,8 @@ class FileValidator
         $validator = ValidatorFacade::make(
             $files,
             [
-                'files.*' => 'file|max:1024',
+                'files' => 'array|max_uploaded_file_size:1',
+                'files.*' => 'file',
             ]
         );
 
