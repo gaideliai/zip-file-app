@@ -18,6 +18,7 @@ class UploadStatisticsService implements UploadStatisticsServiceInterface
         private UploadStatisticsRepositoryInterface $uploadStatisticsRepository
     ) {
     }
+
     /**
      * Insert upload statistics into a database
      *

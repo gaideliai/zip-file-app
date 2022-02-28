@@ -19,7 +19,7 @@ class FileValidator
         $validator = ValidatorFacade::make(
             $files,
             [
-                'files' => 'array|max_uploaded_file_size:1',
+                'files' => 'required|array|max_uploaded_file_size:1',
                 'files.*' => 'file',
             ]
         );

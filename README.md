@@ -7,7 +7,7 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
-File size:
+**File size:**
 1. Validation on Laravel application level - set max size 
 2. PHP settings in php.ini - increase values:
     - upload_max_filesize = 1024M 
@@ -18,4 +18,12 @@ File size:
     - Apache: LimitRequestBody {{size}} (bytes)
 
 Alternatively use chunked upload using e.g., pion/laravel-chunk-upload package.
+
+\
+**Multiple archiving methods:** \
+\
+For each zip method a new {ZipMethodName}FileZipper class can be created. 
+The class must implement FileZipperInterface, then the class used for 
+archiving files is resolved by request parameter 'zip_method' 
+in FileService archiveFiles() method.
 

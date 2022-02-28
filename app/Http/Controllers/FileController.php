@@ -34,18 +34,20 @@ class FileController extends Controller
     public function archiveFiles(Request $request): BinaryFileResponse
     {
         $files = $request->allFiles();
+        $zipMethod = $request->only('zip_method');
+        $ipAddress = $request->ip();
 
         $this->fileValidator->validateFile($files)->validate();
 
-        $fileZip = $this->fileService->archiveFiles($files['files']);
+        $fileZip = $this->fileService->archiveFiles($files['files'], $zipMethod['zip_method']);
 
         $response = response()->download($fileZip);
 
         register_shutdown_function('unlink', $fileZip);
 
-        $ipAddress = $request->ip();
-
-        $this->uploadStatisticsService->insertUploadStatistics($ipAddress);
+        if ($response->getStatusCode() === 200) {
+            $this->uploadStatisticsService->insertUploadStatistics($ipAddress);
+        }
 
         return $response;
     }

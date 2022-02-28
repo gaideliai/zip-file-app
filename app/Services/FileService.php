@@ -2,9 +2,8 @@
 
 namespace App\Services;
 
-use Carbon\Carbon;
 use Exception;
-use ZipArchive;
+use InvalidArgumentException;
 
 class FileService implements FileServiceInterface
 {
@@ -12,45 +11,36 @@ class FileService implements FileServiceInterface
      * Archive uploaded files
      *
      * @param array $files
+     * @param string $zipMethod
      *
      * @return string
      */
-    public function archiveFiles(array $files): string
+    public function archiveFiles(array $files, string $zipMethod): string
     {
         try {
-            $zip = new ZipArchive();
+            $fileZipperClass = $this->resolveFileZipper($zipMethod);
 
-            $directoryPath = sys_get_temp_dir() . '/zipFiles/';
-            $this->bootstrapDirectory($directoryPath);
-
-            $todaysDate = Carbon::today()->toDateString();
-            $fileName = "zip-$todaysDate.zip";
-
-            if ($zip->open("$directoryPath/$fileName", ZipArchive::CREATE) === true) {
-                foreach ($files as $file) {
-                    $zip->addFile($file->path(), $file->getClientOriginalName());
-                }
-
-                $zip->close();
-            }
+            $filePath = (new $fileZipperClass)->generateZipFile($files);
         } catch (Exception $e) {
             throw $e;
         }
 
-        return $directoryPath . $fileName;
+        return $filePath;
     }
 
     /**
-     * Create directory if it doesn't exist
+     * Map zip method to zipper class
      *
-     * @param string $directory
+     * @param string $zipMethod
      *
-     * @return void
+     * @return string
      */
-    private function bootstrapDirectory(string $directory): void
+    private function resolveFileZipper(string $zipMethod): string
     {
-        if (!file_exists($directory)) {
-            mkdir($directory);
-        }
+        return match ($zipMethod) {
+            'ZipArchive' => 'App\\FileZippers\\ZipArchiveFileZipper',
+            'Foo' => 'App\\FileZippers\\FooFileZipper',
+            default => throw new InvalidArgumentException("Invalid zip method $zipMethod")
+        };
     }
 }
