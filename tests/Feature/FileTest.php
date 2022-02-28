@@ -2,12 +2,15 @@
 
 namespace Tests\Feature;
 
+use App\Models\UploadStatistics;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
 
 class FileTest extends TestCase
 {
+    use RefreshDatabase;
+
     /**
      * Test zip files response status is 200.
      *
@@ -25,6 +28,10 @@ class FileTest extends TestCase
         $response = $this->post('/api/zip-files', $uploadedFiles, ['Accept' => 'application/json']);
 
         $response->assertStatus(200);
+
+        $uploadStatistics = UploadStatistics::first();
+
+        $this->assertEquals(1, $uploadStatistics->usage_count_per_day);
     }
 
     /**
@@ -50,6 +57,6 @@ class FileTest extends TestCase
 
         $response->assertStatus(400);
 
-        $this->assertSame($responseBody, $expectedResponse);
+        $this->assertEquals($responseBody, $expectedResponse);
     }
 }

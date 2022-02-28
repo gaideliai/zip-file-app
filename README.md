@@ -25,5 +25,14 @@ Alternatively use chunked upload using e.g., pion/laravel-chunk-upload package.
 For each zip method a new {ZipMethodName}FileZipper class can be created. 
 The class must implement FileZipperInterface, then the class used for 
 archiving files is resolved by request parameter 'zip_method' 
-in FileService archiveFiles() method.
+in FileService archiveFiles() method. 
+
+\
+**Increase in request count**
+
+Limits and quotas can be put on API requests: 
+ - certain number of requests per IP address per day 
+based on usage count per day
+ - certain number of queries per second per IP address
+that can be implemented with Laravel's RateLimiter.
 
